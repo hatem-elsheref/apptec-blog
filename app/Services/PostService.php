@@ -14,7 +14,7 @@ class PostService
     {
         return Post::query()
             ->with(['user', 'comments' => fn($query) => $query->where('is_published', 1)])
-            ->paginate(setting('site_frontend_pagination', 6));
+            ->paginate(setting('site_frontend_pagination', 12));
     }
 
     public function listingAllPosts() :Collection

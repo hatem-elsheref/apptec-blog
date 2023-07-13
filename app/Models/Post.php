@@ -39,4 +39,9 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getImageUrlAttribute() :string
+    {
+        return uploads($this->image);
+    }
 }

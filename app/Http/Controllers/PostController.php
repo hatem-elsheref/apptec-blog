@@ -52,7 +52,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        $post = $this->postService->postDetails($post);
+        return view('site.details', compact('post'));
     }
 
     /**
