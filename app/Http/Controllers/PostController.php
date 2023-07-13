@@ -3,16 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Services\PostService;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class PostController extends Controller
 {
+
+    public function __construct(private readonly PostService $postService){}
+
+    /**
+     * Display a listing of the resource with pagination.
+     */
+    public function page() :View
+    {
+        $posts = $this->postService->listingAllPostsWithPagination();
+
+        return view('site.home', compact('posts'));
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index() :View
     {
-        //
+        $posts = $this->postService->listingAllPosts();
+
+        return view('admin.posts.index', compact('posts'));
     }
 
     /**
@@ -20,7 +36,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.posts.create');
     }
 
     /**

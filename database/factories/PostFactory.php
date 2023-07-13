@@ -20,8 +20,8 @@ class PostFactory extends Factory
     {
         return [
             'user_id' => User::query()->inRandomOrder()->value('id'),
-            'title'   => fake()->sentence(8),
-            'body'    => fake()->sentence(variableNbWords: true),
+            'title'   => fake()->sentence(10),
+            'body'    => fake()->sentence(nbWords:50, variableNbWords: true),
             'video'   => fake()->url,
             'image'   => 'image.png',
         ];

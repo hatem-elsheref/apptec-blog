@@ -29,6 +29,11 @@ class SettingSeeder extends Seeder
                     'key'   => 'site_logo',
                     'value' => 'google.png',
                     'type'  => 'file',
+                ],
+                [
+                    'key'   => 'site_frontend_pagination',
+                    'value' => 6,
+                    'type'  => 'number',
                 ]
             ]
         ];
