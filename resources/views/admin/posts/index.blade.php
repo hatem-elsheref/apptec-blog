@@ -7,8 +7,9 @@
                     {{session('message')}}
                 </div>
             @endif
-            <h3>All Posts</h3>
+            <h3>All Posts ({{$posts->total()}})</h3>
             <div class="card mb-12">
+
                 <div class="card-body">
                     <div class="card-title h4 text-center">
                     </div>

@@ -31,7 +31,7 @@ class CommentService
         }
     }
 
-    public function delete($comment) :array
+    public function deleteComment($comment) :array
     {
         return $comment->delete()
             ? ['type'    => 'success', 'message' => 'Deleted Successfully']

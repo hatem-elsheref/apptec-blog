@@ -23,7 +23,7 @@ class ReactController extends Controller
     {
         $this->authorize('delete', $react);
 
-        $response = $this->reactService->delete($react);
+        $response = $this->reactService->deleteReact($react);
 
         return redirect()->back()
             ->with('type', $response['type'])

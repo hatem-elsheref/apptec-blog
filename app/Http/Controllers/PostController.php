@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -27,37 +29,50 @@ class PostController extends Controller
         return view('admin.posts.index', compact('posts'));
     }
 
-    public function create()
+    public function create() :View
     {
         return view('admin.posts.create');
     }
 
 
-    public function store(Request $request)
+    public function store(PostRequest $request) :RedirectResponse
     {
-        //
+        $response = $this->postService->store($request);
+
+        return redirect()->route('posts.index')
+            ->with('type', $response['type'])
+            ->with('message', $response['message']);
     }
 
 
-    public function show(Post $post)
+    public function show(Post $post) :View
     {
         $post = $this->postService->postDetails($post);
+
         return view('site.details', compact('post'));
     }
 
 
-    public function edit(Post $post)
+    public function edit(Post $post) :View
     {
-        //
+        return view('admin.posts.create', compact('post'));
     }
 
-    public function update(Request $request, Post $post)
+    public function update(PostRequest $request, Post $post) :RedirectResponse
     {
-        //
+        $response = $this->postService->update($request, $post);
+
+        return redirect()->route('posts.index')
+            ->with('type', $response['type'])
+            ->with('message', $response['message']);
     }
 
-    public function destroy(Post $post)
+    public function destroy(Post $post) :RedirectResponse
     {
-        //
+        $response = $this->postService->deletePost($post);
+
+         return redirect()->route('posts.index')
+             ->with('type', $response['type'])
+             ->with('message', $response['message']);
     }
 }

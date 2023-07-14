@@ -27,6 +27,7 @@
                 @auth
                     @if(auth()->user()->is_admin)
                         <li class="nav-item"><a class="nav-link" href="{{route('admin')}}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{route('posts.create')}}">Add Post</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{route('setting.show')}}">Settings</a></li>
                     @endif
                     <li class="nav-item"><a class="nav-link" href="{{route('account.show')}}">Profile</a></li>

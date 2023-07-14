@@ -15,7 +15,7 @@ class ReactService
             'groups' => $reacts->groupBy('is_like')
         ];
     }
-    public function delete($react) :array
+    public function deleteReact($react) :array
     {
         return $react->delete()
             ? ['type'    => 'success', 'message' => 'Deleted Successfully']

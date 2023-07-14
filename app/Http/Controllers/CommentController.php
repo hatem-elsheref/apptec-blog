@@ -37,7 +37,7 @@ class CommentController extends Controller
     {
         $this->authorize('delete', $comment);
 
-        $response = $this->commentService->delete($comment);
+        $response = $this->commentService->deleteComment($comment);
 
         return redirect()->back()
             ->with('type', $response['type'])

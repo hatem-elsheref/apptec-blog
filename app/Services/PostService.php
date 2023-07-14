@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\File;
 
 class PostService
 {
@@ -47,7 +48,7 @@ class PostService
             ->first();
     }
 
-    public function createPost($request) :Model
+    public function store($request) :Model
     {
         $post = Post::query()->create($request->validated());
         // upload image here
@@ -55,7 +56,7 @@ class PostService
         return  $post->fresh();
     }
 
-    public function editPost($request, $post) :Model
+    public function update($request, $post) :Model
     {
         $post->update($request->validated());
         // upload image here
@@ -63,10 +64,15 @@ class PostService
         return $post->fresh();
     }
 
-    public function deletePost($post) :bool
+    public function deletePost($post) :array
     {
-        // delete image here
+        $path = storage_path('app' . DIRECTORY_SEPARATOR . $post->image);
 
-        return $post->delete();
+        if (File::exists($path))
+            File::delete($path);
+
+        return $post->delete()
+            ? ['type'    => 'success', 'message' => 'Deleted Successfully']
+            : ['type'    => 'danger', 'message' => 'Failed To Update'];
     }
 }
