@@ -23,14 +23,14 @@ class SettingRequest extends FormRequest
     public function rules(): array
     {
         $settings = Setting::query()
-            ->select('additional', 'key')
+            ->select('additional', 'id')
             ->where('is_hidden', 0)
-            ->pluck('additional', 'key')->toArray();
+            ->pluck('additional', 'id')->toArray();
 
         $rules = [];
 
         foreach ($settings as $key => $validation){
-            $rules[$key] = json_decode($validation, true)['validation'] ?? [];
+            $rules["setting_$key"] = json_decode($validation, true)['validation'] ?? [];
         }
 
         return $rules;

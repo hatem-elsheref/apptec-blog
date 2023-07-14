@@ -8,7 +8,7 @@
     <meta name="author" content="Hatem Mohamed" />
     <title>{{setting('site_title_general', 'Blog')}}</title>
     <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="{{site_assets('images/' . setting('site_logo_general'))}}" />
+    <link rel="icon" type="image/x-icon" href="/{{setting('site_logo_general')}}" />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="{{site_assets('css/styles.css')}}" rel="stylesheet" />
 </head>
@@ -17,7 +17,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/">
-            <img width="30px" src="{{site_assets('images/' . setting('site_logo_general'))}}" alt="">
+            <img width="30px" src="/{{setting('site_logo_general')}}" alt="">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">

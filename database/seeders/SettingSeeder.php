@@ -20,6 +20,9 @@ class SettingSeeder extends Seeder
                     'value' => 'Blog',
                     'type'  => 'text',
                     'order' => 1,
+                    'additional' => [
+                        'validation' => 'required|string|min:2',
+                    ]
                 ],
                 [
                     'key'   => 'site_close_date',
@@ -33,7 +36,7 @@ class SettingSeeder extends Seeder
                     'type'  => 'file',
                     'order' => 4,
                     'additional' => [
-                        'validation' => 'required|file|mimes:png|jpg|jpeg|max:2048',
+                        'validation' => 'nullable|file|mimes:png,jpg,jpeg|max:2048',
                         'html' => [
                             'accept'  => 'image/png,image/jpg,image/jpeg',
                         ]

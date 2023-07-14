@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('key');
-            $table->string('value');
+            $table->string('value')->nullable();
             $table->enum('type', ['text', 'email', 'number', 'tel', 'file', 'textarea', 'checkbox', 'radio', 'date', 'time']);
             $table->boolean('is_hidden')->default(false);
             $table->string('group');

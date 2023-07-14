@@ -23,8 +23,10 @@ class SettingController extends Controller
 
     public function update(SettingRequest $request) :RedirectResponse
     {
-        $this->settingService->update($request);
+        $response = $this->settingService->update($request);
 
-        return redirect()->route('setting.show');
+        return redirect()->route('setting.show')
+            ->with('type', $response['type'])
+            ->with('message', $response['message']);
     }
 }
