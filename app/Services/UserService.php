@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
@@ -10,18 +12,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class AccountService
+class UserService
 {
     public function me($request) :Model
     {
         return $request->user();
     }
 
-    public function update($request) :array
+    public function listingAllUsers() :Collection
+    {
+        return User::query()->latest('id')->get();
+    }
+
+    public function update($request, $user) :array
     {
         try {
-
-            $user = $this->me($request);
 
             $validatedData = $request->only('name', 'email');
 
@@ -47,15 +52,26 @@ class AccountService
 
             return [
                 'type'    => 'success',
-                'message' => 'Profile Updated Successfully'
+                'message' => 'Updated Successfully'
             ];
         }catch (Exception $exception){
             Log::error($exception->getMessage());
             return [
                 'type'    => 'danger',
-                'message' => 'Failed To Update Profile'
+                'message' => 'Failed To Update'
             ];
         }
+    }
+
+    public function delete($user) :array
+    {
+        if (File::exists(storage_path('app' . DIRECTORY_SEPARATOR . $user->avatar))){
+            File::delete(storage_path('app' . DIRECTORY_SEPARATOR . $user->avatar));
+        }
+
+        return $user->delete()
+            ? ['type'    => 'success', 'message' => 'Deleted Successfully']
+            : ['type'    => 'danger', 'message' => 'Failed To Update'];
     }
 }
 

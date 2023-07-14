@@ -23,12 +23,19 @@ class AccountRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name'          => ['required', 'string', 'max:255'],
             'email'         => ['required', 'string', 'email', 'max:255', 'unique:users,id,'. $this->user()->id],
-            'old_password'  => ['required_with:password', 'string', 'min:8', new CheckOldPassword($this->user())],
-            'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
             'avatar'        => [Rule::when(!empty($this->avatar), ['mimes:png,jpg,jpeg', 'max:2048'])]
         ];
+
+        if ($this->routeIs('account.update'))
+            $rules[] = [
+                'old_password'  => ['required_with:password', 'string', 'min:8', new CheckOldPassword($this->user())],
+                'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
+            ];
+
+
+        return  $rules;
     }
 }

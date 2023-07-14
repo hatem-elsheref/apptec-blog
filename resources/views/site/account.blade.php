@@ -57,6 +57,7 @@
 
 
                     <div class="mb-3">
+                        <label for="avatar" class="mb-2">Avatar</label>
                         <input id="avatar" type="file" class="form-control @error('avatar') is-invalid @enderror" name="avatar" >
                         @error('avatar')
                         <span class="invalid-feedback" role="alert">

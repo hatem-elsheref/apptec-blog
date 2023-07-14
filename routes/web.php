@@ -23,18 +23,18 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['password.confirm' => false]);
 
-Route::get('/admin'       , [AdminController::class, 'index'])->name('admin');
 Route::get('/'            , [PostController::class, 'page'])->name('home');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
-Route::singleton('/account', AccountController::class)->except('edit');
-Route::singleton('/setting', SettingController::class)->except('edit');
 
 Route::middleware(['auth'])->group(function (){
     Route::prefix('admin')->middleware('admin')->group(function (){
         Route::resource('posts'         , PostController::class)->except('show');
         Route::resource('posts.comments', CommentController::class)->except('create', 'store', 'show');
         Route::resource('users'         , UserController::class)->except('create', 'store', 'show');
+        Route::singleton('/setting'     , SettingController::class)->except('edit');
+        Route::get('/'                    , [AdminController::class, 'index'])->name('admin');
     });
 
+    Route::singleton('/account', AccountController::class)->except('edit');
 });
 

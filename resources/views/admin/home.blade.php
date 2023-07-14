@@ -12,7 +12,7 @@
                 <div class="card-body">
                     <div class="card-title h4 text-center">
                         <div class="small">
-                            <a  type="button" class="btn btn-outline-primary"
+                            <a  href="{{route('users.index')}}" type="button" class="btn btn-outline-primary"
                                 style="display: block;--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                 Manage Users →
                             </a>
@@ -26,7 +26,7 @@
                 <div class="card-body">
                     <div class="card-title h4 text-center">
                         <div class="small">
-                            <a  type="button" class="btn btn-outline-danger"
+                            <a  href="{{route('posts.index')}}" type="button" class="btn btn-outline-danger"
                                 style="display: block;--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
                                 Manage Posts →
                             </a>

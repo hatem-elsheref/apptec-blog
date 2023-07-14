@@ -9,10 +9,7 @@ use Illuminate\View\View;
 
 class SettingController extends Controller
 {
-    public function __construct(private readonly SettingService $settingService)
-    {
-        $this->middleware(['auth:web', 'admin']);
-    }
+    public function __construct(private readonly SettingService $settingService){}
 
     public function show() :View
     {

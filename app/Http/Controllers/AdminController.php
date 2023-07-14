@@ -7,10 +7,7 @@ use Illuminate\View\View;
 
 class AdminController extends Controller
 {
-    public function __construct(private readonly AdminService $adminService)
-    {
-        $this->middleware(['auth:web', 'admin']);
-    }
+    public function __construct(private readonly AdminService $adminService){}
 
     public function index() :View
     {
