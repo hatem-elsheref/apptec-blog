@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.master')
 @section('content')
     <!-- Post content-->
     <article>

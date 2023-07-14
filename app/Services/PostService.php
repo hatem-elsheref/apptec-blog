@@ -14,16 +14,18 @@ class PostService
     {
         return Post::query()
             ->with(['user', 'comments' => fn($query) => $query->published()])
+            ->latest()
             ->paginate(setting('site_frontend_pagination_general', 12));
     }
 
-    public function listingAllPosts() :Collection
+    public function listingAllPosts() :LengthAwarePaginator
     {
         return Post::query()
             ->withCount('likes')
             ->withCount('disLikes')
             ->withCount('comments')
-            ->get();
+            ->latest()
+            ->paginate();
     }
 
     public function postReacts() :Collection

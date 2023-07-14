@@ -2,64 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CommentRequest;
 use App\Models\Comment;
-use Illuminate\Http\Request;
+use App\Models\Post;
+use App\Services\CommentService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class CommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private readonly CommentService $commentService){}
+
+    public function index(Post $post) :View
     {
-        //
+        $comments = $this->commentService->listingAllPostComments($post);
+
+        return view('admin.posts.comments.index', compact('post', 'comments'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function edit(Post $post, Comment $comment) :View
     {
-        //
+        return view('admin.posts.comments.edit', compact('post', 'comment'));
+    }
+    public function update(CommentRequest $request, Post $post, Comment $comment) :RedirectResponse
+    {
+        $response = $this->commentService->update($request, $comment);
+
+        return redirect()->route('posts.comments.index', $post->id)
+            ->with('type', $response['type'])
+            ->with('message', $response['message']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function destroy(Post $post, Comment $comment) :RedirectResponse
     {
-        //
-    }
+        $response = $this->commentService->delete($comment);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Comment $comment)
-    {
-        //
+        return redirect()->route('posts.comments.index', $post->id)
+            ->with('type', $response['type'])
+            ->with('message', $response['message']);
     }
 }
