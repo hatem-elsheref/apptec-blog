@@ -19,6 +19,10 @@ class Admin
         if ($request->user()->is_admin)
             return $next($request);
 
-        abort(Response::HTTP_FORBIDDEN);
+
+        return $request->expectsJson()
+            ? redirect()->route('home')
+            : response()->json(['message' => 'not allowed to access this resource'], Response::HTTP_FORBIDDEN);
+
     }
 }

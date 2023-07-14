@@ -14,7 +14,7 @@
             <a target="_blank" href="{{route('posts.show', $post->id)}}" class="btn btn-sm btn-warning">
                 Read Post
             </a>
-            <h3>All Comments Of Post </h3>
+            <h3>All Comments Of Post (<small>{{$comments->count()}}</small>)</h3>
                 <h6 class="badge text-bg-warning">{{$post->id}} - {{$post->title}}</h6>
             <div class="card mb-12">
                 <div class="card-body">

@@ -39,7 +39,7 @@ class CommentController extends Controller
 
         $response = $this->commentService->delete($comment);
 
-        return redirect()->route('posts.comments.index', $post->id)
+        return redirect()->back()
             ->with('type', $response['type'])
             ->with('message', $response['message']);
     }
