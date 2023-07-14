@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.master')
 @section('content')
     <div class="row">
         @foreach($posts as $post)

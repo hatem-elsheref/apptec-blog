@@ -16,6 +16,12 @@ class Comment extends Model
         'is_published' => 'boolean'
     ];
 
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', 1);
+    }
+
+
     public function post() :BelongsTo
     {
         return $this->belongsTo(Post::class);

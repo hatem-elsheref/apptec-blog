@@ -14,7 +14,6 @@ class Post extends Model
     protected $fillable = ['title', 'body', 'image', 'video', 'user_id'];
 
 
-
     public function reacts() :HasMany
     {
         return $this->hasMany(React::class);

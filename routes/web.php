@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,12 +21,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+Auth::routes(['password.confirm' => false]);
 
-Auth::routes();
-
-Route::get('/home'        , [PostController::class, 'page']);
+Route::get('/admin'       , [AdminController::class, 'index'])->name('admin');
 Route::get('/'            , [PostController::class, 'page'])->name('home');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+Route::singleton('/account', AccountController::class)->except('edit');
+Route::singleton('/setting', SettingController::class)->except('edit');
 
 Route::middleware(['auth'])->group(function (){
     Route::prefix('admin')->middleware('admin')->group(function (){
@@ -31,10 +36,5 @@ Route::middleware(['auth'])->group(function (){
         Route::resource('users'         , UserController::class)->except('create', 'store', 'show');
     });
 
-    Route::middleware('auth')->group(function (){
-//        Route::post('posts', PostController::class);
-//        Route::post('comments', [CommentController::class, 'store']);
-//        Route::resource('users', UserController::class)->except('create', 'store', 'show');
-    });
 });
 

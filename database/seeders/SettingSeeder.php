@@ -19,27 +19,45 @@ class SettingSeeder extends Seeder
                     'key'   => 'site_title',
                     'value' => 'Blog',
                     'type'  => 'text',
+                    'order' => 1,
                 ],
                 [
                     'key'   => 'site_close_date',
                     'value' => 'Blog',
-                    'type'  => 'datetime',
+                    'type'  => 'date',
+                    'order' => 2,
                 ],
                 [
                     'key'   => 'site_logo',
-                    'value' => 'google.png',
+                    'value' => 'GOOG.png',
                     'type'  => 'file',
+                    'order' => 4,
+                    'additional' => [
+                        'validation' => 'required|file|mimes:png|jpg|jpeg|max:2048',
+                        'html' => [
+                            'accept'  => 'image/png,image/jpg,image/jpeg',
+                        ]
+                    ]
                 ],
                 [
                     'key'   => 'site_frontend_pagination',
                     'value' => 6,
                     'type'  => 'number',
+                    'order' => 3,
+                    'additional' => [
+                        'validation' => 'required|numeric|min:1',
+                        'html' => [
+                            'min'  => 1,
+                            'step' => 1,
+                        ]
+                    ]
                 ]
             ]
         ];
 
         foreach ($settings as $group => $items){
             foreach ($items as $item){
+                if (isset($item['additional'])) $item['additional'] = json_encode($item['additional']);
                 Setting::query()->create([
                     'group' => $group,
                     ...$item

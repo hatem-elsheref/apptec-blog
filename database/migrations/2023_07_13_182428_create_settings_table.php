@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('key');
             $table->string('value');
-            $table->enum('type', ['text', 'email', 'number', 'tel', 'file', 'textarea', 'checkbox', 'radio', 'date', 'datetime', 'time']);
+            $table->enum('type', ['text', 'email', 'number', 'tel', 'file', 'textarea', 'checkbox', 'radio', 'date', 'time']);
             $table->boolean('is_hidden')->default(false);
             $table->string('group');
+            $table->unsignedInteger('order')->default(1);
             $table->json('additional')->nullable();
             $table->unique(['key', 'group']);
             $table->timestamps();

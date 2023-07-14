@@ -70,4 +70,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(React::class)->where('is_like', 0);
     }
+
+    public function getAvatarUrlAttribute() :string
+    {
+        return uploads($this->avatar);
+    }
 }

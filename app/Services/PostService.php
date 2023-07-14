@@ -13,8 +13,8 @@ class PostService
     public function listingAllPostsWithPagination() :LengthAwarePaginator
     {
         return Post::query()
-            ->with(['user', 'comments' => fn($query) => $query->where('is_published', 1)])
-            ->paginate(setting('site_frontend_pagination', 12));
+            ->with(['user', 'comments' => fn($query) => $query->published()])
+            ->paginate(setting('site_frontend_pagination_general', 12));
     }
 
     public function listingAllPosts() :Collection

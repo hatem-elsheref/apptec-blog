@@ -33,6 +33,6 @@ if (!function_exists('setting')){
             return $settings;
         });
 
-        return Arr::get($settings, $key, $default);
+        return is_null($key) ? $settings : Arr::get($settings, $key, $default);
     }
 }
