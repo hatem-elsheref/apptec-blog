@@ -44,7 +44,10 @@
                                 </td>
                                 <td class="text-nowrap">
                                     <a href="{{route('posts.comments.index', $post->id)}}" class="btn btn-sm btn-info">
-                                        Manage Comments
+                                        Comments
+                                    </a>
+                                    <a href="{{route('posts.reacts.index', $post->id)}}" class="btn btn-sm btn-secondary">
+                                        Reacts
                                     </a>
                                     <button onclick="document.getElementById('delete-{{$post->id}}').submit()" class="btn btn-sm btn-danger">
                                         Delete

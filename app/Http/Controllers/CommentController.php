@@ -35,6 +35,8 @@ class CommentController extends Controller
 
     public function destroy(Post $post, Comment $comment) :RedirectResponse
     {
+        $this->authorize('delete', $comment);
+
         $response = $this->commentService->delete($comment);
 
         return redirect()->route('posts.comments.index', $post->id)

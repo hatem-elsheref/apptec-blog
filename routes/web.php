@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ReactController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -27,14 +28,18 @@ Route::get('/'            , [PostController::class, 'page'])->name('home');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 Route::middleware(['auth'])->group(function (){
+
     Route::prefix('admin')->middleware('admin')->group(function (){
         Route::resource('posts'         , PostController::class)->except('show');
-        Route::resource('posts.comments', CommentController::class)->except('create', 'store', 'show');
+        Route::resource('posts.comments', CommentController::class)->except('create', 'store', 'show', 'destroy');
+        Route::resource('posts.reacts'  , ReactController::class)->only('index');
         Route::resource('users'         , UserController::class)->except('create', 'store', 'show');
         Route::singleton('/setting'     , SettingController::class)->except('edit');
         Route::get('/'                    , [AdminController::class, 'index'])->name('admin');
     });
 
+    Route::resource('posts.reacts'  , ReactController::class)->only('destroy');
+    Route::resource('posts.comments', CommentController::class)->only('destroy');
     Route::singleton('/account', AccountController::class)->except('edit');
 });
 

@@ -22,7 +22,14 @@ class DatabaseSeeder extends Seeder
              'is_admin' => true,
          ]);
 
-         $this->call(PostSeeder::class);
+
+        User::factory()->create([
+            'name'     => 'User',
+            'email'    => 'user@yahoo.com',
+        ]);
+
+
+        $this->call(PostSeeder::class);
 
          $this->call(ReactSeeder::class);
 
