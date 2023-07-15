@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Post;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\File;
@@ -15,6 +14,9 @@ class PostService
     {
         return Post::query()
             ->with(['user', 'comments' => fn($query) => $query->published()])
+            ->withCount('likes')
+            ->withCount('disLikes')
+            ->withCount('comments')
             ->latest()
             ->paginate(setting('site_frontend_pagination_general', 12));
     }
@@ -29,22 +31,13 @@ class PostService
             ->paginate();
     }
 
-    public function postReacts() :Collection
-    {
-        return Post::query()->with('reacts')->get();
-    }
-
-    public function postComments() :Collection
-    {
-        return Post::query()->with('comments')->get();
-    }
-
     public function postDetails($post) :Model
     {
         return Post::query()->where('id', $post->id)
-            ->with('comments')
+            ->with('comments', fn($query) => $query->latest())
             ->withCount('likes')
             ->withCount('disLikes')
+            ->withCount('comments')
             ->first();
     }
 
@@ -64,7 +57,7 @@ class PostService
         return $post->fresh();
     }
 
-    public function deletePost($post) :array
+    public function delete($post) :array
     {
         $path = storage_path('app' . DIRECTORY_SEPARATOR . $post->image);
 

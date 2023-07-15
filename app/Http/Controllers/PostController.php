@@ -6,7 +6,6 @@ use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Services\PostService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -69,7 +68,7 @@ class PostController extends Controller
 
     public function destroy(Post $post) :RedirectResponse
     {
-        $response = $this->postService->deletePost($post);
+        $response = $this->postService->delete($post);
 
          return redirect()->route('posts.index')
              ->with('type', $response['type'])

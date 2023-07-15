@@ -21,8 +21,8 @@ class Admin
 
 
         return $request->expectsJson()
-            ? redirect()->route('home')
-            : response()->json(['message' => 'not allowed to access this resource'], Response::HTTP_FORBIDDEN);
+            ? response()->json(['message' => 'not allowed to access this resource'], Response::HTTP_FORBIDDEN)
+            : redirect()->route('home');
 
     }
 }
