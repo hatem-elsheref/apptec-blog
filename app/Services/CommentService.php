@@ -31,6 +31,25 @@ class CommentService
         }
     }
 
+    public function store($request) :array
+    {
+        try {
+
+            Comment::query()->create($request->validated());
+
+            return [
+                'type'    => 'success',
+                'message' => 'Updated Successfully'
+            ];
+        }catch (Exception $exception){
+            Log::error($exception->getMessage());
+            return [
+                'type'    => 'danger',
+                'message' => 'Failed To Update'
+            ];
+        }
+    }
+
     public function deleteComment($comment) :array
     {
         return $comment->delete()

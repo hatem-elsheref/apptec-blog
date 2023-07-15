@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CommentRequest extends FormRequest
 {
@@ -21,16 +22,25 @@ class CommentRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'comment'      => ['required', 'string', 'min:2'],
-            'is_published' => ['required', 'boolean']
-        ];
+        if ($this->routeIs('posts.comments.store'))
+            return [
+                'comment'      => ['required', 'string', 'min:2'],
+                'user_id'      => ['required', 'numeric', Rule::exists('users', 'id')],
+                'post_id'      => ['required', 'numeric', Rule::exists('posts', 'id')],
+            ];
+        else
+            return [
+                'comment'      => ['required', 'string', 'min:2'],
+                'is_published' => ['required', 'boolean']
+            ];
     }
 
     protected function prepareForValidation()
     {
         $this->merge([
-           'is_published' => $this->boolean('is_published')
+            'is_published' => $this->boolean('is_published'),
+            'user_id'      => $this->user()->id,
+            'post_id'      => $this->route('post')->id,
         ]);
     }
 }

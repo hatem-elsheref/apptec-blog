@@ -31,7 +31,7 @@ Route::middleware(['auth'])->group(function (){
 
     Route::prefix('admin')->middleware('admin')->group(function (){
         Route::resource('posts'         , PostController::class)->except('show');
-        Route::resource('posts.comments', CommentController::class)->except('create', 'store', 'show', 'destroy');
+        Route::resource('posts.comments', CommentController::class)->only('index', 'edit', 'update');
         Route::resource('posts.reacts'  , ReactController::class)->only('index');
         Route::resource('users'         , UserController::class)->except('create', 'store', 'show');
         Route::singleton('/setting'     , SettingController::class)->except('edit');
@@ -39,7 +39,7 @@ Route::middleware(['auth'])->group(function (){
     });
 
     Route::resource('posts.reacts'  , ReactController::class)->only('destroy');
-    Route::resource('posts.comments', CommentController::class)->only('destroy');
+    Route::resource('posts.comments', CommentController::class)->only('destroy', 'store');
     Route::singleton('/account', AccountController::class)->except('edit');
 });
 

@@ -33,6 +33,14 @@ class CommentController extends Controller
             ->with('message', $response['message']);
     }
 
+    public function store(CommentRequest $request, Post $post) :RedirectResponse
+    {
+        $response = $this->commentService->store($request);
+
+        return redirect()->route('posts.show', $post->id)
+            ->with('type', $response['type'])
+            ->with('message', $response['message']);
+    }
     public function destroy(Post $post, Comment $comment) :RedirectResponse
     {
         $this->authorize('delete', $comment);
