@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class PostService
 {
@@ -43,10 +45,15 @@ class PostService
 
     public function store($request) :Model
     {
-        $post = Post::query()->create($request->validated());
-        // upload image here
+        if ($request->image instanceof UploadedFile)
+            $path = $request->image->storeAs('uploads' . DIRECTORY_SEPARATOR . 'posts', Str::uuid()->toString() . '.' . $request->image->getClientOriginalExtension());
 
-        return  $post->fresh();
+        return Post::query()->create([
+            ...$request->validated(),
+            'video' => sprintf('v-%s', md5(sprintf('%s-%s', time(), Str::random(10)))),
+            'image' => $path ?? ''
+        ]);
+
     }
 
     public function update($request, $post) :Model

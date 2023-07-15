@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'vimeo' => [
+        'id'     => env('VIMEO_CLIENT'),
+        'secret' => env('VIMEO_SECRET'),
+        'token'  => env('VIMEO_ACCESS'),
+        'url'    => env('VIMEO_URL'),
+    ],
+
 ];

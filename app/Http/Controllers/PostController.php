@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Http\Requests\VideoRequest;
+use App\Http\Resources\PostResource;
+use App\Jobs\UploadVideoToVimeo;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -30,17 +34,21 @@ class PostController extends Controller
 
     public function create() :View
     {
-        return view('admin.posts.create');
+        return view('admin.posts.2create');
     }
 
 
-    public function store(PostRequest $request) :RedirectResponse
+    public function store(PostRequest $request) :JsonResponse
     {
         $response = $this->postService->store($request);
 
-        return redirect()->route('posts.index')
-            ->with('type', $response['type'])
-            ->with('message', $response['message']);
+        return $response instanceof Post
+            ? response()->json(['post' => new PostResource($response), 'status' => true])
+            : response()->json(['post' =>  null, 'status' => false]);
+
+//        return redirect()->route('posts.index')
+//            ->with('type', $response['type'])
+//            ->with('message', $response['message']);
     }
 
 
@@ -73,5 +81,13 @@ class PostController extends Controller
          return redirect()->route('posts.index')
              ->with('type', $response['type'])
              ->with('message', $response['message']);
+    }
+
+    public function upload(VideoRequest $request) :JsonResponse
+    {
+        if ($request->size === $request->end){
+            UploadVideoToVimeo::dispatch($request->tmp, $request->user(), $this->post);
+        }
+        return response()->json(['message' => 'success', 'part' => $request->end]);
     }
 }

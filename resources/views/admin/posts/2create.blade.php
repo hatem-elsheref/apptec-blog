@@ -17,7 +17,7 @@
     </style>
 @endsection
 @section('content')
-    <div class="row">
+    <div class="row" id="app">
         <div class="row justify-content-between">
             <div class="col-md-12">
                 @if(session()->has('type'))
@@ -29,41 +29,27 @@
                     @csrf
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
-                        <input class="form-control  @error('title') is-invalid @enderror" name="title" type="text" id="title" value="{{old('title')}}">
-                        @error('title')
-                        <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
+                        <input class="form-control" name="title" type="text" id="title" value="{{old('title')}}">
+                        <span class="text-danger" role="alert"><strong id="title-error"></strong></span>
+
                     </div>
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
-                        <textarea class="form-control @error('body') is-invalid @enderror" name="body" id="editor" cols="30" rows="10">{!! old('body') !!}</textarea>
-                        @error('body')
-                        <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
+                        <textarea class="form-control" name="body" id="body" cols="30" rows="10">{!! old('body') !!}</textarea>
+                        <span class="text-danger" role="alert"><strong id="body-error"></strong></span>
                     </div>
 
                     <div class="mb-3">
                         <label for="image" class="mb-2">Image</label>
-                        <input id="image" accept="image/jpeg,image/png,image/jpg" type="file" class="form-control @error('image') is-invalid @enderror" name="image" >
-                            @error('image')
-                            <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
+                        <input id="image" accept="image/jpeg,image/png,image/jpg" type="file" class="form-control" name="image" >
+                        <span class="text-danger" role="alert"><strong id="image-error"></strong></span>
+
                     </div>
 
                     <div class="mb-3">
                         <label for="video" class="mb-2">Video</label>
-                        <input id="video" accept="video/mp4" type="file" class="form-control @error('video') is-invalid @enderror" name="video" >
-                        @error('video')
-                        <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                        @enderror
+                        <input required id="video" accept="video/mp4" type="file" class="form-control" name="video" >
+                        <span class="text-danger" role="alert"><strong id="video-error"></strong></span>
                     </div>
                     <div class="mb-3 text-lg-end">
                         <button type="submit" class="btn btn-success">
@@ -80,7 +66,7 @@
 @section('js')
     <script src="https://cdn.ckeditor.com/ckeditor5/38.1.1/super-build/ckeditor.js"></script>
     <script>
-        CKEDITOR.ClassicEditor.create(document.getElementById("editor"), {
+        CKEDITOR.ClassicEditor.create(document.getElementById("body"), {
             toolbar: {
                 items: [
                     'exportPDF','exportWord', '|',
@@ -230,45 +216,42 @@
         document.getElementById('myForm').onsubmit = function (event){
             event.preventDefault();
             let title = document.getElementById('title').value
-            let body = document.getElementById('editor').value
-            let image = document.getElementById('image').files[0]
+            let body = document.getElementById('body').value
+            let image = document.getElementById('image').files[0] ?? null
+            let video = document.getElementById('video').files[0] ?? null
 
+            var formData = new FormData();
+            formData.append('title', title);
+            formData.append('body', body);
+            formData.append('image', image);
             fetch('{{route('posts.store')}}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{csrf_token()}}',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
                 },
-                body: {
-                    title : title,
-                    body  : body,
-                    image : image,
-                }
+                body: formData
             }).then((response) => response.json())
               .then(function (data){
+                  document.getElementById(`title-error`).innerHTML = ''
+                  document.getElementById(`body-error`).innerHTML = ''
+                  document.getElementById(`image-error`).innerHTML = ''
+                  document.getElementById(`video-error`).innerHTML = ''
+
                   if(data.code === 422 && !data.status){
-                      console.log(data.message)
-                      console.log(data.errors)
                       for (error in data.errors) {
-                          document.getElementById('title').
-                          data.errors[error][0]
-                          console.log()
+                          document.getElementById(`${error}-error`).innerHTML = data.errors[error][0]
                       }
-                      data.errors.for(function (item){
-                          console.log(item)
-                      })
                   }else{
-                      console.log('post submitted')
+                      if(data.status){
+                          let worker = new Worker('/worker.js')
+                          worker.postMessage([data, video])
+                          worker.onmessage = function (event){
+                              console.log('in file load progress here')
+                          }
+                      }
                   }
               });
-
-            // let video = document.getElementById('video').value
-
-
-            // console.log(title)
-            // console.log(body)
-            // console.log(image)
-            // console.log(video)
             return false;
         };
     </script>

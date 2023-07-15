@@ -22,24 +22,27 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+// visitor
 Auth::routes(['password.confirm' => false]);
-
 Route::get('/'            , [PostController::class, 'page'])->name('home');
-Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
+// user && admin
 Route::middleware(['auth'])->group(function (){
-
+    // admin
     Route::prefix('admin')->middleware('admin')->group(function (){
+        Route::get('/'                    , [AdminController::class, 'index'])->name('admin');
         Route::resource('posts'         , PostController::class)->except('show');
         Route::resource('posts.comments', CommentController::class)->only('index', 'edit', 'update');
         Route::resource('posts.reacts'  , ReactController::class)->only('index');
         Route::resource('users'         , UserController::class)->except('create', 'store', 'show');
         Route::singleton('/setting'     , SettingController::class)->except('edit');
-        Route::get('/'                    , [AdminController::class, 'index'])->name('admin');
+        Route::post('/upload'             , [PostController::class, 'upload']);
     });
 
-    Route::resource('posts.reacts'  , ReactController::class)->only('destroy');
+    // user
+    Route::resource('posts'         , PostController::class)->only('show');
     Route::resource('posts.comments', CommentController::class)->only('destroy', 'store');
-    Route::singleton('/account', AccountController::class)->except('edit');
+    Route::resource('posts.reacts'  , ReactController::class)->only('destroy');
+    Route::singleton('/account'     , AccountController::class)->except('edit');
 });
 
