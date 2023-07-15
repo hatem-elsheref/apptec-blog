@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('body');
             $table->string('image');
             $table->string('video');
+            $table->boolean('is_published')->default(false);
             $table->foreignId('user_id')->constrained('users')
                 ->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();

@@ -11,7 +11,17 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'body', 'image', 'video', 'user_id'];
+    protected $fillable = ['title', 'body', 'image', 'video', 'user_id', 'is_published'];
+
+
+    protected $casts = [
+        'is_published' => 'boolean'
+    ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', 1);
+    }
 
 
     public function reacts() :HasMany

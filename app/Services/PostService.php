@@ -15,6 +15,7 @@ class PostService
     public function listingAllPostsWithPagination() :LengthAwarePaginator
     {
         return Post::query()
+            ->published()
             ->with(['user', 'comments' => fn($query) => $query->published()])
             ->withCount('likes')
             ->withCount('disLikes')
@@ -36,6 +37,7 @@ class PostService
     public function postDetails($post) :Model
     {
         return Post::query()->where('id', $post->id)
+            ->published()
             ->with('comments', fn($query) => $query->latest())
             ->withCount('likes')
             ->withCount('disLikes')
