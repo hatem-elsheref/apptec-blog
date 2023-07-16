@@ -50,9 +50,9 @@ class Upload
 
 
             $response = json_decode($response->getBody()->getContents(), true);
-            if (isset($response['uri'], $response['upload']['upload_link']) && $response['upload']['approach'] === 'tus'){
+            if (isset($response['player_embed_url'], $response['upload']['upload_link']) && $response['upload']['approach'] === 'tus'){
                 $post->update([
-                    'video' => $response['uri']
+                    'video' => $response['player_embed_url']
                 ]);
                 return $response['upload']['upload_link'];
             }

@@ -29,6 +29,7 @@
         <!-- Post content-->
         <section class="mb-5">
             {!! $post->body !!}
+            <iframe src="{{$post->video}}" width="100%" height="564" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </section>
     </article>
     <!-- Comments section-->
