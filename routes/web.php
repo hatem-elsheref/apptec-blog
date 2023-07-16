@@ -46,3 +46,12 @@ Route::middleware(['auth'])->group(function (){
     Route::singleton('/account'     , AccountController::class)->except('edit');
 });
 
+Route::get('/test', function (){
+    $file = base_path('..' . DIRECTORY_SEPARATOR . 'v-1080.mp4');
+
+    $chunkSize = 1024 * 1024 *  config('services.vimeo.size', 5); //5MB
+
+    $offsets = range(0, filesize($file), $chunkSize);
+
+
+});
