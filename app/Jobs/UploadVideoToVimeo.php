@@ -10,6 +10,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+
 
 class UploadVideoToVimeo implements ShouldQueue
 {
@@ -40,6 +42,7 @@ class UploadVideoToVimeo implements ShouldQueue
     private function create($size) :self
     {
         $this->uploadUrl = $this->uploadService->create($size);
+        Log::error('url => ' . $this->uploadUrl);
         return $this;
     }
     private function upload() :self

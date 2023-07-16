@@ -27,7 +27,8 @@ class SendNotificationToAuthor implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($post = Post::query()->find($this->post))
+        if ($post = Post::query()->find($this->post)){
             $this->user->notify(new VideoUploadedSuccessfully($post));
+        }
     }
 }

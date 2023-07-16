@@ -3,6 +3,8 @@
 namespace App\Services\Vimeo;
 
 use App\Jobs\SendNotificationToAuthor;
+use App\Jobs\VerifyUploadedFile;
+use App\Models\Post;
 use App\Models\User;
 use Exception;
 use Illuminate\Bus\Batch;
@@ -29,16 +31,18 @@ class Upload
     public function create(int $size) :string|null
     {
         try {
-            return Http::withToken($this->token)
+            $response = Http::withToken($this->token)
                 ->withHeader('Content-Type', 'application/json')
                 ->withHeader('Accept', 'application/vnd.vimeo.*+json;version=3.4')
-                ->asForm()
                 ->post($this->url . '/me/videos', [
                     'upload' => [
                         'approach' => 'tus',
                         'size' => $size
                     ]
-                ])->json('upload.upload_link');
+                ])->json();
+
+            Log::error($response);
+            return $response['upload']['upload_link'];
         }catch (Exception $exception){
             Log::error($exception->getMessage());
             return null;
@@ -47,27 +51,32 @@ class Upload
 
     public function upload(string $url, string $path, User $user, int $post)
     {
-        $size = 1024 * 1024 * 2; //2MB
+        $size = 1024 * 1024 * config('services.vimeo.size', 2);
         if (File::exists($path)){
             $fileHandler = fopen($path, 'rb');
-            $offset = 0;
+            $start  = 0;
             $jobs = [];
             while (!feof($fileHandler)){
                 $chunk = fread($fileHandler, $size);
                 $nextOffset = ftell($fileHandler);
-                $jobs[] = new \App\Jobs\Upload($size, $chunk, $offset, $nextOffset);
-                $offset = $nextOffset;
+                $chunkSize = strlen($chunk);
+                $jobs[] = new \App\Jobs\Upload($url, $path, $start, $chunkSize, $nextOffset);
+                $start = $nextOffset;
             }
 
             if (!empty($jobs)){
-                $jobs[] = new SendNotificationToAuthor($user, $post);
                 try {
-                    Bus::batch($jobs)->finally(function () use ($path) {
-                        File::delete($path);
+                    Bus::batch($jobs)->then(function () use ($url, $user, $post){
+                      VerifyUploadedFile::dispatch($url, $user, $post);
+                    })->finally(function () use ($path) {
+//                        File::delete($path);
                     })->catch(function (Batch $batch, Throwable $e) {
-                        $batch->cancel();
+//                        $batch->cancel();
                         Log::error($e->getMessage());
-                    })->dispatch();
+                    })
+                        ->allowFailures()
+                        ->dispatch();
+
                 } catch (Throwable $e) {
                     Log::error($e->getMessage());
                 }
@@ -75,8 +84,22 @@ class Upload
         }
     }
 
-    public function verify()
+    public static function verify($url, $user, $post)
     {
-
+        try {
+            $response = Http::withHeaders([
+                'Tus-Resumable'  => '1.0.0',
+                'Accept'         => 'application/offset+octet-stream',
+            ])->head($url)->headers();
+            if ($response['Upload-Length'] == $response['Upload-Offset']){
+                SendNotificationToAuthor::dispatch($user, $post);
+                Post::query()->where('id', $post)->update([
+                    'is_published' => true
+                ]);
+            }
+        }catch (Exception $exception){
+            Log::error($exception->getMessage());
+            return null;
+        }
     }
 }

@@ -36,6 +36,7 @@ return [
         'secret' => env('VIMEO_SECRET'),
         'token'  => env('VIMEO_ACCESS'),
         'url'    => env('VIMEO_URL'),
+        'size'   => env('VIMEO_CHUNK_SIZE'),
     ],
 
 ];

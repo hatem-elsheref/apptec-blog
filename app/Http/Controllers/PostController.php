@@ -10,6 +10,7 @@ use App\Models\Post;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -86,7 +87,7 @@ class PostController extends Controller
     public function upload(VideoRequest $request) :JsonResponse
     {
         if ($request->size === $request->end){
-            UploadVideoToVimeo::dispatch($request->tmp, $request->user(), $this->post);
+            UploadVideoToVimeo::dispatch($request->tmp, $request->user(), $request->post);
         }
         return response()->json(['message' => 'success', 'part' => $request->end]);
     }

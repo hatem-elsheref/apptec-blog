@@ -2,20 +2,20 @@
 
 namespace App\Notifications;
 
-use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class VideoUploadedSuccessfully extends Notification
+class VideoUploadedSuccessfully extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(private readonly Post $post){}
+    public function __construct(private readonly Model $post){}
 
     /**
      * Get the notification's delivery channels.
