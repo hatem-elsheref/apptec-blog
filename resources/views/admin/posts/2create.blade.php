@@ -20,11 +20,13 @@
     <div class="row" id="app">
         <div class="row justify-content-between">
             <div class="col-md-12">
-                @if(session()->has('type'))
-                    <div class="alert alert-{{session('type')}}">
-                        {{session('message')}}
+                <div class="alert alert-success" id="success-msg" style="display: none">
+                   Post Created Successfully, Your Vidoe Is Processing Now In Background
+                    <p>Dont Leave or reload this page the video is uploading in background</p>
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
                     </div>
-                @endif
+                </div>
                 <form method="POST" id="myForm" action="{{ route('posts.store')}}" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
@@ -244,10 +246,14 @@
                       }
                   }else{
                       if(data.status){
+                          document.getElementById('success-msg').style.display = 'block';
+                          window.scrollTo({top: 0, behavior: "smooth"});
                           let worker = new Worker('/worker.js')
                           worker.postMessage([data, video])
                           worker.onmessage = function (event){
-                              console.log('in file load progress here')
+                              if(event.data === 'ok'){
+                                  document.location.reload();
+                              }
                           }
                       }
                   }

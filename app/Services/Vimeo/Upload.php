@@ -10,7 +10,6 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Batch;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -113,7 +112,7 @@ class Upload
 
             if (isset($response['Upload-Length'], $response['Upload-Offset']) && $response['Upload-Length'] == $response['Upload-Offset']){
                 SendNotificationToAuthor::dispatch($user, $post, true);
-                Post::query()->where('id', $post)->update([
+                Post::query()->where('id', $post->id)->update([
                     'is_published' => true
                 ]);
             }

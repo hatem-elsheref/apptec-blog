@@ -7,6 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReactController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Notifications\VideoUploadedSuccessfully;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 

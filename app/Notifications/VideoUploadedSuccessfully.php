@@ -7,8 +7,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
-class VideoUploadedSuccessfully extends Notification implements ShouldQueue
+class VideoUploadedSuccessfully extends Notification
 {
     use Queueable;
 
@@ -33,9 +34,17 @@ class VideoUploadedSuccessfully extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('Your Video Uploaded Successfully For Post ' . $this->post->title)
-                    ->action('Check Now', route('posts.show', $this->post->id))
-                    ->line('Thank you for using our application!');
+                    ->subject("Video Status")
+                    ->view('mail.master', [
+                        'name'         => $notifiable->name,
+                        '_message'     =>
+                            $this->status
+                                ? 'Your Video Uploaded Successfully For Post ' . $this->post->title
+                                : 'Failed To Upload Video Check Vimeo Free Space Or Limit',
+                        'url'          => $this->status ? route('posts.show', $this->post->id) : null,
+                        'url_name'     => 'Check Now',
+                        'message2'     => 'Thank you for using our application!',
+                    ]);
     }
 
 }

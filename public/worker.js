@@ -36,6 +36,7 @@ self.addEventListener('message', function(event) {
             offset += chunkData.byteLength;
             chunk = await fileReader.read(chunkSize);
         }
+        self.postMessage('ok')
         console.log('File uploaded successfully!');
     })()
 
