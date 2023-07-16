@@ -13,7 +13,7 @@ self.addEventListener('message', function(event) {
         // Upload the file in chunks
 
         let formData = new FormData();
-        formData.append('video', post.video);
+        formData.append('video', post.new_video);
         formData.append('post', post.id);
 
         while (!chunk.done) {

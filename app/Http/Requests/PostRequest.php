@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class PostRequest extends FormRequest
@@ -27,7 +28,7 @@ class PostRequest extends FormRequest
         return [
             'title'  => ['required', 'string', 'min:2'],
             'body'   => ['required', 'string', 'min:2'],
-            'image'  => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:2048'],
+            'image'  => [Rule::when($this->route()->getName() === 'posts.store', ['file', 'mimes:png,jpg,jpeg', 'max:2048'])],
             'user_id'=> ['required', 'numeric', Rule::exists('users', 'id')]
         ];
     }

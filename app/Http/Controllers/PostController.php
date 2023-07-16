@@ -57,16 +57,16 @@ class PostController extends Controller
 
     public function edit(Post $post) :View
     {
-        return view('admin.posts.create', compact('post'));
+        return view('admin.posts.edit', compact('post'));
     }
 
-    public function update(PostRequest $request, Post $post) :RedirectResponse
+    public function update(PostRequest $request, Post $post) :JsonResponse
     {
         $response = $this->postService->update($request, $post);
 
-        return redirect()->route('posts.index')
-            ->with('type', $response['type'])
-            ->with('message', $response['message']);
+        return $response instanceof Post
+            ? response()->json(['post' => new PostResource($response), 'status' => true])
+            : response()->json(['post' =>  null, 'status' => false]);
     }
 
     public function destroy(Post $post) :RedirectResponse

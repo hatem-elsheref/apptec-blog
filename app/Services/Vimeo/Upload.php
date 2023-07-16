@@ -51,9 +51,10 @@ class Upload
 
             $response = json_decode($response->getBody()->getContents(), true);
             if (isset($response['player_embed_url'], $response['upload']['upload_link']) && $response['upload']['approach'] === 'tus'){
-                $post->update([
-                    'video' => $response['player_embed_url']
-                ]);
+                if (is_null($post->video))
+                    $post->update(['video' => $response['player_embed_url'], 'new_video' => $response['player_embed_url']]);
+                else
+                    $post->update(['new_video' => $response['player_embed_url']]);
                 return $response['upload']['upload_link'];
             }
             throw new Exception("Failed To Create Video");
@@ -113,8 +114,10 @@ class Upload
             if (isset($response['Upload-Length'], $response['Upload-Offset']) && $response['Upload-Length'] == $response['Upload-Offset']){
                 SendNotificationToAuthor::dispatch($user, $post, true);
                 Post::query()->where('id', $post->id)->update([
-                    'is_published' => true
+                    'is_published' => true,
+                    'video'        => $post->new_video
                 ]);
+                // if post->video is not null and valid url send http request to delete it
             }
         }catch (Exception|GuzzleException $exception){
             Log::error("Failed To Verify Uploaded File " . $post->video);

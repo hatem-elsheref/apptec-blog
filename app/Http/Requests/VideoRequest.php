@@ -27,7 +27,7 @@ class VideoRequest extends FormRequest
     {
         return [
             'post'  => ['required', 'numeric', Rule::exists('posts', 'id')],
-            'video' => ['required', 'string', Rule::exists('posts', 'video')->where('id', $this->input('post'))],
+            'video' => ['required', 'string', Rule::exists('posts', 'new_video')->where('id', $this->input('post'))],
             'tmp'   => []
         ];
     }

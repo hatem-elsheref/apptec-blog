@@ -54,16 +54,31 @@ class PostService
 
         return Post::query()->create([
             ...$request->validated(),
-            'video' => sprintf('v-%s', md5(sprintf('%s-%s', time(), Str::random(10)))),
-            'image' => $path ?? ''
+            'new_video' => sprintf('v-%s', md5(sprintf('%s-%s', time(), Str::random(10)))),
+            'image'     => $path ?? ''
         ]);
 
     }
 
     public function update($request, $post) :Model
     {
-        $post->update($request->validated());
-        // upload image here
+        $validatedData = $request->only('title', 'body');
+
+        $validatedData['new_video'] = sprintf('v-%s', md5(sprintf('%s-%s', time(), Str::random(10))));
+
+        if ($request->hasFile('image') && $request->image instanceof UploadedFile){
+
+            $old_path = storage_path('app' . DIRECTORY_SEPARATOR . $post->image);
+
+            if (File::exists($old_path))
+                File::delete($old_path);
+
+            $path = $request->image->storeAs('uploads' . DIRECTORY_SEPARATOR . 'posts', Str::uuid()->toString() . '.' . $request->image->getClientOriginalExtension());
+
+            $validatedData['image'] = $path;
+        }
+
+        $post->update($validatedData);
 
         return $post->fresh();
     }
