@@ -18,6 +18,7 @@ class CommentService
     {
         try {
             $comment->update($request->validated());
+
             return [
                 'type'    => 'success',
                 'message' => 'Updated Successfully'

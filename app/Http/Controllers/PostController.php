@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Http\Requests\VideoRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -30,17 +33,17 @@ class PostController extends Controller
 
     public function create() :View
     {
-        return view('admin.posts.create');
+        return view('admin.posts.2create');
     }
 
 
-    public function store(PostRequest $request) :RedirectResponse
+    public function store(PostRequest $request) :JsonResponse
     {
         $response = $this->postService->store($request);
 
-        return redirect()->route('posts.index')
-            ->with('type', $response['type'])
-            ->with('message', $response['message']);
+        return $response instanceof Post
+            ? response()->json(['post' => new PostResource($response), 'status' => true])
+            : response()->json(['post' =>  null, 'status' => false]);
     }
 
 
@@ -54,16 +57,16 @@ class PostController extends Controller
 
     public function edit(Post $post) :View
     {
-        return view('admin.posts.create', compact('post'));
+        return view('admin.posts.edit', compact('post'));
     }
 
-    public function update(PostRequest $request, Post $post) :RedirectResponse
+    public function update(PostRequest $request, Post $post) :JsonResponse
     {
         $response = $this->postService->update($request, $post);
 
-        return redirect()->route('posts.index')
-            ->with('type', $response['type'])
-            ->with('message', $response['message']);
+        return $response instanceof Post
+            ? response()->json(['post' => new PostResource($response), 'status' => true])
+            : response()->json(['post' =>  null, 'status' => false]);
     }
 
     public function destroy(Post $post) :RedirectResponse
@@ -73,5 +76,18 @@ class PostController extends Controller
          return redirect()->route('posts.index')
              ->with('type', $response['type'])
              ->with('message', $response['message']);
+    }
+
+    public function upload(VideoRequest $request) :JsonResponse
+    {
+        if ($request->size === $request->end){
+            $this->postService->upload($request);
+            $finished = true;
+        }
+        return response()
+            ->json([
+                'message'  => 'success',
+                'part'     => $request->end,
+                'finished' => $finished ?? false]);
     }
 }

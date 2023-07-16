@@ -25,7 +25,7 @@
                         {{session('message')}}
                     </div>
                 @endif
-                <form method="POST" action="{{ route('posts.store')}}" enctype="multipart/form-data">
+                <form method="POST" id="myForm" action="{{ route('posts.store')}}" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
@@ -48,17 +48,17 @@
 
                     <div class="mb-3">
                         <label for="image" class="mb-2">Image</label>
-                        <input id="image" type="file" class="form-control @error('image') is-invalid @enderror" name="image" >
-                        @error('image')
-                        <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                        <input id="image" accept="image/jpeg,image/png,image/jpg" type="file" class="form-control @error('image') is-invalid @enderror" name="image" >
+                            @error('image')
+                            <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                            </span>
                         @enderror
                     </div>
 
                     <div class="mb-3">
                         <label for="video" class="mb-2">Video</label>
-                        <input id="video" type="file" class="form-control @error('video') is-invalid @enderror" name="video" >
+                        <input id="video" accept="video/mp4" type="file" class="form-control @error('video') is-invalid @enderror" name="video" >
                         @error('video')
                         <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -225,6 +225,51 @@
                 'TableOfContents'
             ]
         })
+    </script>
+    <script>
+        document.getElementById('myForm').onsubmit = function (event){
+            event.preventDefault();
+            let title = document.getElementById('title').value
+            let body = document.getElementById('editor').value
+            let image = document.getElementById('image').files[0]
 
+            fetch('{{route('posts.store')}}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{csrf_token()}}',
+                    'Accept': 'application/json'
+                },
+                body: {
+                    title : title,
+                    body  : body,
+                    image : image,
+                }
+            }).then((response) => response.json())
+              .then(function (data){
+                  if(data.code === 422 && !data.status){
+                      console.log(data.message)
+                      console.log(data.errors)
+                      for (error in data.errors) {
+                          document.getElementById('title').
+                          data.errors[error][0]
+                          console.log()
+                      }
+                      data.errors.for(function (item){
+                          console.log(item)
+                      })
+                  }else{
+                      console.log('post submitted')
+                  }
+              });
+
+            // let video = document.getElementById('video').value
+
+
+            // console.log(title)
+            // console.log(body)
+            // console.log(image)
+            // console.log(video)
+            return false;
+        };
     </script>
 @endsection
