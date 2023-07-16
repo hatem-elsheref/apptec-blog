@@ -15,7 +15,7 @@ class VideoUploadedSuccessfully extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(private readonly Model $post){}
+    public function __construct(private readonly Model $post, private readonly bool $status){}
 
     /**
      * Get the notification's delivery channels.

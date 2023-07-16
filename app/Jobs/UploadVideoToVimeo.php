@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Post;
 use App\Models\User;
 use App\Services\Vimeo\Upload;
 use Illuminate\Bus\Queueable;
@@ -18,14 +19,15 @@ class UploadVideoToVimeo implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private Upload $uploadService;
-    private string|null $uploadUrl;
     /**
      * Create a new job instance.
      */
-    public function __construct(private readonly string $path, private readonly User $user, private readonly int $post)
+    public function __construct(
+        private readonly string $path,
+        private readonly User $user,
+        private readonly Post $post,
+        private string|null $uploadUrl = null)
     {
-        $this->uploadUrl = null;
-        $this->uploadService = new Upload();
     }
 
     /**
@@ -33,24 +35,26 @@ class UploadVideoToVimeo implements ShouldQueue
      */
     public function handle(): void
     {
+        $this->uploadService = new Upload();
+
         if (File::exists($this->path)){
             $size = File::size($this->path);
-            $this->create($size)->upload();
+            $this->create($size)->upload($size);
         }
     }
 
     private function create($size) :self
     {
-        $this->uploadUrl = $this->uploadService->create($size);
-        Log::error('url => ' . $this->uploadUrl);
+        $this->uploadUrl = $this->uploadService->create($size, $this->post);
         return $this;
     }
-    private function upload() :self
+    private function upload($fileSize) :void
     {
         if ($this->uploadUrl){
-            $this->uploadService->upload($this->uploadUrl, $this->path, $this->user, $this->post);
+            $this->uploadService->upload($fileSize, $this->uploadUrl, $this->path, $this->user, $this->post);
+        }else{
+            Log::error("Failed To Upload File Because Url Returned From Create Api Is null");
         }
-        return $this;
     }
 
 

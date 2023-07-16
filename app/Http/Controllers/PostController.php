@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\VideoRequest;
 use App\Http\Resources\PostResource;
-use App\Jobs\UploadVideoToVimeo;
 use App\Models\Post;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -46,10 +44,6 @@ class PostController extends Controller
         return $response instanceof Post
             ? response()->json(['post' => new PostResource($response), 'status' => true])
             : response()->json(['post' =>  null, 'status' => false]);
-
-//        return redirect()->route('posts.index')
-//            ->with('type', $response['type'])
-//            ->with('message', $response['message']);
     }
 
 
@@ -87,8 +81,13 @@ class PostController extends Controller
     public function upload(VideoRequest $request) :JsonResponse
     {
         if ($request->size === $request->end){
-            UploadVideoToVimeo::dispatch($request->tmp, $request->user(), $request->post);
+            $this->postService->upload($request);
+            $finished = true;
         }
-        return response()->json(['message' => 'success', 'part' => $request->end]);
+        return response()
+            ->json([
+                'message'  => 'success',
+                'part'     => $request->end,
+                'finished' => $finished ?? false]);
     }
 }

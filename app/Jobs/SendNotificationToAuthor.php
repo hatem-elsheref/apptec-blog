@@ -20,15 +20,13 @@ class SendNotificationToAuthor implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private readonly User $user, private readonly int $post){}
+    public function __construct(private readonly User $user, private readonly Post $post, private readonly bool $status = false){}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        if ($post = Post::query()->find($this->post)){
-            $this->user->notify(new VideoUploadedSuccessfully($post));
-        }
+        $this->user->notify(new VideoUploadedSuccessfully($this->post, $this->status));
     }
 }

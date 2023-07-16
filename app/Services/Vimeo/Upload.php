@@ -7,75 +7,89 @@ use App\Jobs\VerifyUploadedFile;
 use App\Models\Post;
 use App\Models\User;
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Batch;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Throwable;
 
 class Upload
 {
     private string $url;
-    private string $id;
     private string $token;
+    private string $id;
     private string $secret;
+    private Client $client;
     public function __construct()
     {
         $this->url    = config('services.vimeo.url');
         $this->id     = config('services.vimeo.id');
         $this->token  = config('services.vimeo.token');
         $this->secret = config('services.vimeo.secret');
+        $this->client = new Client();
     }
 
-    public function create(int $size) :string|null
+    public function create(int $size, Post $post) :string|null
     {
         try {
-            $response = Http::withToken($this->token)
-                ->withHeader('Content-Type', 'application/json')
-                ->withHeader('Accept', 'application/vnd.vimeo.*+json;version=3.4')
-                ->post($this->url . '/me/videos', [
-                    'upload' => [
-                        'approach' => 'tus',
-                        'size' => $size
-                    ]
-                ])->json();
+            $response = $this->client->post(sprintf("%s/%s", $this->url, 'me/videos'), [
+                'headers' => [
+                    'Content-Type'  => 'application/json',
+                    'Accept'        => 'application/vnd.vimeo.*+json;version=3.4',
+                    'Authorization' => sprintf('Bearer %s', $this->token)
+                ],
+                'body' => json_encode([
+                    'upload'      => ['approach' => 'tus', 'size' => $size],
+                    'name'        => Str::limit($post->title, 20) . '-' . $post->created_at->format('d-m-Y H:i'),
+                    'description' => $post->title
+                ])
+            ]);
 
-            Log::error($response);
-            return $response['upload']['upload_link'];
-        }catch (Exception $exception){
+
+            $response = json_decode($response->getBody()->getContents(), true);
+            if (isset($response['uri'], $response['upload']['upload_link']) && $response['upload']['approach'] === 'tus'){
+                $post->update([
+                    'video' => $response['uri']
+                ]);
+                return $response['upload']['upload_link'];
+            }
+            throw new Exception("Failed To Create Video");
+        }catch (Exception|GuzzleException $exception){
             Log::error($exception->getMessage());
             return null;
         }
     }
 
-    public function upload(string $url, string $path, User $user, int $post)
+    public function upload(int $fileSize, string $url, string $path, User $user, Post $post) :void
     {
-        $size = 1024 * 1024 * config('services.vimeo.size', 2);
+
         if (File::exists($path)){
-            $fileHandler = fopen($path, 'rb');
-            $start  = 0;
+            $chunkSize = 1024 * 1024 *  config('services.vimeo.size', 5); //5MB
+
+            $offsets = range(0, $fileSize, $chunkSize);
+
             $jobs = [];
-            while (!feof($fileHandler)){
-                $chunk = fread($fileHandler, $size);
-                $nextOffset = ftell($fileHandler);
-                $chunkSize = strlen($chunk);
-                $jobs[] = new \App\Jobs\Upload($url, $path, $start, $chunkSize, $nextOffset);
-                $start = $nextOffset;
+            foreach ($offsets as $offset){
+                $jobs[] = new \App\Jobs\Upload($url, $path, $offset, $chunkSize);
             }
 
             if (!empty($jobs)){
                 try {
                     Bus::batch($jobs)->then(function () use ($url, $user, $post){
                       VerifyUploadedFile::dispatch($url, $user, $post);
-                    })->finally(function () use ($path) {
-//                        File::delete($path);
+                    })->finally(function (Batch $batch) use ($path, $user, $post) {
+                        $batch->hasFailures()
+                            ? SendNotificationToAuthor::dispatch($user, $post, false)
+                            : File::delete($path);
                     })->catch(function (Batch $batch, Throwable $e) {
-//                        $batch->cancel();
+                        Log::error("Failed In Bus Batch " . $batch->id);
+                        Log::error("Bus Batch Progress Is " . $batch->progress());
                         Log::error($e->getMessage());
-                    })
-                        ->allowFailures()
-                        ->dispatch();
+                    })->allowFailures()->dispatch();
 
                 } catch (Throwable $e) {
                     Log::error($e->getMessage());
@@ -84,22 +98,28 @@ class Upload
         }
     }
 
-    public static function verify($url, $user, $post)
+    public static function verify($url, $user, $post) :void
     {
         try {
-            $response = Http::withHeaders([
-                'Tus-Resumable'  => '1.0.0',
-                'Accept'         => 'application/offset+octet-stream',
-            ])->head($url)->headers();
-            if ($response['Upload-Length'] == $response['Upload-Offset']){
-                SendNotificationToAuthor::dispatch($user, $post);
+            $client = new Client();
+
+            $response = $client->head($url, [
+                'headers' => [
+                    'Tus-Resumable'  => '1.0.0',
+                    'Accept'         => 'application/offset+octet-stream',
+                ]
+            ])->getHeaders();
+
+
+            if (isset($response['Upload-Length'], $response['Upload-Offset']) && $response['Upload-Length'] == $response['Upload-Offset']){
+                SendNotificationToAuthor::dispatch($user, $post, true);
                 Post::query()->where('id', $post)->update([
                     'is_published' => true
                 ]);
             }
-        }catch (Exception $exception){
+        }catch (Exception|GuzzleException $exception){
+            Log::error("Failed To Verify Uploaded File " . $post->video);
             Log::error($exception->getMessage());
-            return null;
         }
     }
 }

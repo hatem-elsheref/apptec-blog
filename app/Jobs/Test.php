@@ -29,6 +29,7 @@ class Test implements ShouldQueue
     {
         if (is_null($this->url)) $this->fail("Please Check Url First , Then Try Again");
 
+
         $fileHandler = fopen($this->file_path, 'rb');
         fseek($fileHandler, $this->start);
         $chunk = fread($fileHandler, $this->size);

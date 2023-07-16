@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Jobs\UploadVideoToVimeo;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PostService
@@ -76,5 +78,14 @@ class PostService
         return $post->delete()
             ? ['type'    => 'success', 'message' => 'Deleted Successfully']
             : ['type'    => 'danger', 'message' => 'Failed To Update'];
+    }
+
+    public function upload($request) :void
+    {
+        $post = Post::query()->where('is_published', 0)->where('id', $request->post)->first();
+
+        if ($post && File::exists($request->tmp)){
+            UploadVideoToVimeo::dispatch($request->tmp, $request->user(), $post);
+        }
     }
 }
