@@ -40,7 +40,7 @@ class PostService
     {
         return Post::query()->where('id', $post->id)
             ->published()
-            ->with('comments', fn($query) => $query->latest())
+            ->with('comments', fn($query) => $query->published()->latest())
             ->withCount('likes')
             ->withCount('disLikes')
             ->withCount('comments')

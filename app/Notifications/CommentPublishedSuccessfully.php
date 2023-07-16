@@ -2,22 +2,20 @@
 
 namespace App\Notifications;
 
+use App\Models\Comment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CommentPublishedSuccessfully extends Notification
+class CommentPublishedSuccessfully extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(private readonly Comment $comment){}
 
     /**
      * Get the notification's delivery channels.
@@ -35,9 +33,14 @@ class CommentPublishedSuccessfully extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject("Comment Published")
+            ->view('mail.master', [
+                'name'         => $notifiable->name,
+                '_message'     => 'Admin Publish Your Comment For Post ' . $this->comment->post_id,
+                'url'          =>  route('posts.show', $this->comment->post_id),
+                'url_name'     => 'Check Now',
+                'message2'     => 'Thank you for using our application!',
+            ]);
     }
 
     /**
