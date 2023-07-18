@@ -47,7 +47,7 @@ class Setting extends Model
 
     public function getIsSimpleAttribute() :bool
     {
-        return in_array($this->type, ['number', 'text', 'tel', 'email', 'date', 'time']);
+        return in_array($this->type, ['number', 'text', 'tel', 'email', 'date', 'time', 'datetime-local']);
     }
 
     public function getIsRadioOrCheckAttribute() :bool

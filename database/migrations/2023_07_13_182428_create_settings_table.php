@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('key');
             $table->string('value')->nullable();
-            $table->enum('type', ['text', 'email', 'number', 'tel', 'file', 'textarea', 'checkbox', 'radio', 'date', 'time']);
+            $table->enum('type', ['text', 'email', 'number', 'tel', 'file', 'textarea', 'checkbox', 'radio', 'date', 'time', 'datetime-local']);
             $table->boolean('is_hidden')->default(false);
             $table->string('group');
             $table->unsignedInteger('order')->default(1);
