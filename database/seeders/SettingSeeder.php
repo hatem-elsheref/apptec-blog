@@ -25,8 +25,8 @@ class SettingSeeder extends Seeder
                     ]
                 ],
                 [
-                    'key'   => 'site_close_date',
-                    'value' => 'Blog',
+                    'key'   => 'site_open_date',
+                    'value' => now()->addYear()->format('Y-m-d'),
                     'type'  => 'date',
                     'order' => 2,
                 ],

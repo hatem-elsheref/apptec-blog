@@ -7,7 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReactController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
-use App\Notifications\VideoUploadedSuccessfully;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +21,17 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/soon', function (){
+    return Carbon::parse(setting('site_open_date_general', today()))->greaterThan(today())
+        ? view('soon')
+        : redirect()->route('home');
+})->name('soon');
 
-
-// visitor
 Auth::routes(['password.confirm' => false]);
-Route::get('/'            , [PostController::class, 'page'])->name('home');
+// visitor
+Route::middleware('is_closed')->group(function (){
+    Route::get('/' , [PostController::class, 'page'])->name('home');
+});
 
 // user && admin
 Route::middleware(['auth'])->group(function (){
@@ -41,8 +47,10 @@ Route::middleware(['auth'])->group(function (){
     });
 
     // user
-    Route::resource('posts'         , PostController::class)->only('show');
-    Route::resource('posts.comments', CommentController::class)->only('destroy', 'store');
-    Route::resource('posts.reacts'  , ReactController::class)->only('destroy');
-    Route::singleton('/account'     , AccountController::class)->except('edit');
+  Route::middleware('is_closed')->group(function (){
+      Route::resource('posts'         , PostController::class)->only('show');
+      Route::resource('posts.comments', CommentController::class)->only('destroy', 'store');
+      Route::resource('posts.reacts'  , ReactController::class)->only('destroy');
+      Route::singleton('/account'     , AccountController::class)->except('edit');
+  });
 });
