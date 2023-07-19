@@ -37,15 +37,4 @@ class SettingRequest extends FormRequest
 
         return $rules;
     }
-
-    protected function prepareForValidation()
-    {
-        foreach ($this->rules() as $name => $rule){
-            if (!$this->filled($name) && Str::contains($rule, 'in:'))
-                $this->merge([
-                    $name => $this->input($name, 0)
-                ]);
-
-        }
-    }
 }

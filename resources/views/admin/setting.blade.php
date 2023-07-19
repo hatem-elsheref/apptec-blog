@@ -22,11 +22,6 @@
                             <label for="setting-{{$setting->id}}" class="form-label">{{$setting->key_name}}</label>
                             <input {{$setting->html}} class="form-control" name="{{sprintf('setting_%s', $setting->id)}}" type="{{$setting->type}}" id="setting-{{$setting->id}}" value="{{$setting->value}}">
                         </div>
-                        @elseif($setting->is_radio_or_check)
-                            <div class="mb-3">
-                                <input {{$setting->html}} class="form-check-input" name="{{sprintf('setting_%s', $setting->id)}}" type="{{$setting->type}}" id="setting-{{$setting->id}}" value="1" @checked($setting->value == 1)>
-                                <label for="setting-{{$setting->id}}" class="form-label">{{$setting->key_name}}</label>
-                            </div>
                         @elseif($setting->is_file)
                         <div class="mb-3">
                             <label for="setting-{{$setting->id}}" class="form-label">{{$setting->key_name}}</label>
