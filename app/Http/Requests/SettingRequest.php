@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Setting;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class SettingRequest extends FormRequest
 {
@@ -33,6 +34,18 @@ class SettingRequest extends FormRequest
             $rules["setting_$key"] = json_decode($validation, true)['validation'] ?? [];
         }
 
+
         return $rules;
+    }
+
+    protected function prepareForValidation()
+    {
+        foreach ($this->rules() as $name => $rule){
+            if (!$this->filled($name) && Str::contains($rule, 'in:'))
+                $this->merge([
+                    $name => $this->input($name, 0)
+                ]);
+
+        }
     }
 }

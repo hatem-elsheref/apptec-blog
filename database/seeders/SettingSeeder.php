@@ -25,6 +25,18 @@ class SettingSeeder extends Seeder
                     ]
                 ],
                 [
+                    'key'   => 'site_is_closed',
+                    'value' => 1,
+                    'type'  => 'checkbox',
+                    'order' => 2,
+                    'additional' => [
+                        'validation' => 'nullable|in:0,1',
+                        'html' => [
+                            'accept'  => 'image/png,image/jpg,image/jpeg',
+                        ]
+                    ]
+                ],
+                [
                     'key'   => 'site_open_date',
                     'value' => now()->addYear()->format('Y-m-d'),
                     'type'  => 'date',
