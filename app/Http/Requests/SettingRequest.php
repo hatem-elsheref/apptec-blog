@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Setting;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class SettingRequest extends FormRequest
 {
@@ -32,6 +33,7 @@ class SettingRequest extends FormRequest
         foreach ($settings as $key => $validation){
             $rules["setting_$key"] = json_decode($validation, true)['validation'] ?? [];
         }
+
 
         return $rules;
     }
